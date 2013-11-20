@@ -1,0 +1,24 @@
+
+==== List of stopwords ====
+ 
+stopFilePath = stoplist-smart-sys.txt
+
+
+
+==== Do stemming? (Y/N) ====
+
+performStemming = N
+
+
+
+==== Background reference corpus and cutoff on logliklihood ratio ====
+
+backgroundCorpusFreqCounts = bgCounts-Giga.txt
+topicWordCutoff = 10.0
+
+
+
+==== File/File(s) to compute topic words for ===
+==== Can be the path to a folder if topic words for the set of articles as a whole must be computed ====
+
+inputFile = sampleTexts/input-cluster1

@@ -1,0 +1,13 @@
+==== Do not change these values ====
+stopFilePath = stoplist-smart-sys.txt
+performStemming = N
+backgroundCorpusFreqCounts = bgCounts-Giga.txt
+topicWordCutoff = 0.1
+
+==== Directory to compute topic words on ====
+
+inputDir = /home1/c/cis530/hw4/data_type2
+
+==== Output File ====
+
+outputFile = /home1/c/cis530/hw4/type2.ts

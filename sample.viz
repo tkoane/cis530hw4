@@ -1,0 +1,18 @@
+graph G {
+coffee -- company;
+coffee -- llc;
+company -- coffee;
+company -- seattle;
+company -- acquired;
+company -- sold;
+company -- adjusted;
+year -- fiscal;
+year -- 2004;
+year -- believes;
+announced -- transaction;
+earnings -- fiscal;
+earnings -- 2003;
+earnings -- adjusted;
+earnings -- target;
+earnings -- stated;
+}
