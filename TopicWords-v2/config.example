@@ -6,8 +6,8 @@ topicWordCutoff = 0.1
 
 ==== Directory to compute topic words on ====
 
-inputDir = /home1/c/cis530/hw4/data_type2
+inputDir = /home1/c/cis530/hw4/data_type1
 
 ==== Output File ====
 
-outputFile = ~/cis530/cis530hw4/type2.ts
+outputFile = /home1/y/yaouwang/cis530/cis530hw4/type1.ts
