@@ -3,6 +3,7 @@
 
 from nltk.corpus import PlaintextCorpusReader
 from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.corpus import wordnet as wn
 import math
 import string
 import random
@@ -48,10 +49,109 @@ def load_collection_tokens(directory):
 #end of functions from hw1
 
 def load_topic_words(topic_file):
-    pass
+    tokens = load_file_tokens(topic_file)
+    map = dict()
+    i = 0
+    while i < len(tokens):
+        map[tokens[i]] = float(tokens[i+1])
+        i = i + 2
+    return map
+
+def get_top_n_topic_words(topic_words_dict, n):
+    sort = sorted(topic_words_dict.items(), key=lambda x: x[1], reverse=True)
+    words = []
+    for i in range(n):
+        words.append(sort[i][0])
+    return words
+
+'''
+1.2.2
+
+The top 20 words from data type 1 are:
+['news', 'corp', 'stake', 'talks', 'conocophillips', 'interest', 'sale',
+ 'bid', 'comment', 'reported', 'sources', 'assets', 'reportedly', 'company',
+  'media', 'lukoil', 'murdoch', 'aes', 'bids', 'heinz']
+  
+The top 20 words from data type 2 are:
+['amount', 'fixed', 'offering', 'income', 'mm', 'filed', 'corp', 'completed',
+ 'registration', 'sec', 'aes', 'million', 'declared', 'effective', 'fpl',
+  'corporation', 'announced', 'kimberly', 'offered', 'conocophillips']
+  
+We see that while there are some similar words such as 'corp', 'announced', 
+etc., overall they are different. The first one has words like 'assets', 
+'bids', and 'talks', while the second one has words like 'income', 
+'fixed' and 'amount'.
+
+'''
+
+def is_noun(word):
+    return len(wn.synsets(word, pos=wn.NOUN)) > 0
+
+def get_similarity(word1, word2):
+    synsets1 = wn.synsets(word1, pos=wn.NOUN)
+    synsets2 = wn.synsets(word2, pos=wn.NOUN)
+    sim = 0
+    for synset1 in synsets1:
+        for synset2 in synsets2:
+            num = synset1.path_similarity(synset2)
+            if num > sim:
+                sim = num
+    return sim
+
+def get_all_pairs_similarity(word_list):
+    ret = []
+    for i in range(len(word_list)-1):
+        for j in range(i+1, len(word_list)):
+            ret.append((word_list[i], word_list[j], get_similarity(word_list[i], word_list[j])))
+    return ret
+
+#helper to remove elements that are not nouns in wordnet
+def remove_elements(word_list):
+    ret = []
+    for word in word_list:
+        if is_noun(word):
+            ret.append(word)
+    return ret
+
+def gen_topic_edges(word_list, minimum):
+    word_list = remove_elements(word_list)
+    ret = []
+    for i in range(len(word_list)-1):
+        b = True
+        for j in range(i+1, len(word_list)):
+            if get_similarity(word_list[i], word_list[j]) >= minimum:
+                ret.append((word_list[i],word_list[j]))
+                b = False
+        if b:
+            ret.append((word_list[i],))
+    return ret
+
+def create_graphviz_file(edge_list, output_file):
+    f = open(output_file, 'w')
+    f.write('graph G {\n')
+    for edge in edge_list:
+        if len(edge) == 1:
+            f.write(edge[0] + ';\n')
+        else:
+            f.write(edge[0] + ' -- ' + edge[1] + ';\n')
+    f.write('}')
+    f.close()
 
 def main():
-    pass
-
+    type1 = load_topic_words('type1.ts')
+    type2 = load_topic_words('type2.ts')
+    type1_list = get_top_n_topic_words(type1, 20)
+    type2_list = get_top_n_topic_words(type2, 20)
+    #print is_noun('chess')
+    #print get_similarity('operation', 'find')
+    #print get_all_pairs_similarity(['settlement', 'camp', 'base', 'country'])
+    #type1_list = remove_elements(type1_list)
+    #type2_list = remove_elements(type2_list)
+    #1.3.3 running get_all_pairs_similarity on the top 20 words for each topic
+    #print get_all_pairs_similarity(type1_list)
+    #print get_all_pairs_similarity(type2_list)
+    create_graphviz_file(gen_topic_edges(type1_list, 0.25), 'type1.viz')
+    create_graphviz_file(gen_topic_edges(type2_list, 0.25), 'type2.viz')
+    
 if __name__ == "__main__":
     main()

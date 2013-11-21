@@ -1,0 +1,12 @@
+graph G {
+amount -- income;
+amount -- sec;
+amount -- million;
+offering;
+income;
+mm;
+corp -- corporation;
+registration;
+sec;
+million;
+}

@@ -1,0 +1,25 @@
+graph G {
+news -- interest;
+corp;
+stake -- interest;
+stake -- assets;
+talks -- bid;
+talks -- comment;
+talks -- media;
+talks -- bids;
+interest -- assets;
+interest -- company;
+sale -- bid;
+sale -- comment;
+sale -- media;
+sale -- bids;
+bid -- comment;
+bid -- bids;
+comment -- bids;
+sources -- murdoch;
+assets;
+company;
+media;
+murdoch;
+bids;
+}
