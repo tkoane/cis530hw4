@@ -137,6 +137,38 @@ def create_graphviz_file(edge_list, output_file):
     f.write('}')
     f.close()
 
+def get_most_specific(n, word_list):
+    dictionary = dict()
+    for word in word_list:
+        if isnoun(word):
+            synsets = wn.synsets(word, pos=wn.NOUN)
+            depth = synsets[0].min_depth()
+            for synset in synsets:
+                if synset.min_depth() < depth:
+                    depth = synset.min_depth()
+            dictionary[word] = depth
+    dictionary = sorted(dictionary.items(), key=lambda x: x[1], reverse=True)
+    ret = []
+    for i in range(n):
+        ret.append(dictionary[i][0])
+    return ret
+
+def get_least_specific(n, word_list):
+    dictionary = dict()
+    for word in word_list:
+        if isnoun(word):
+            synsets = wn.synsets(word, pos=wn.NOUN)
+            depth = synsets[0].min_depth()
+            for synset in synsets:
+                if synset.min_depth() > depth:
+                    depth = synset.min_depth()
+            dictionary[word] = depth
+    dictionary = sorted(dictionary.items(), key=lambda x: x[1])
+    ret = []
+    for i in range(n):
+        ret.append(dictionary[i][0])
+    return ret
+        
 def main():
     type1 = load_topic_words('type1.ts')
     type2 = load_topic_words('type2.ts')
