@@ -4,6 +4,7 @@
 from nltk.corpus import PlaintextCorpusReader
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import wordnet as wn
+from nltk.corpus import stopwords
 import math
 import string
 import random
@@ -194,6 +195,13 @@ def get_most_polysemous(n, word_list, part_of_speech):
 
 def get_least_polysemous(n, word_list, part_of_speech):
     return list(reversed(get_polysemous(n, word_list, part_of_speech)))[:n]
+
+def get_context(word, tok_sents):
+    context = set()
+    for sent in tok_sents:
+        if word in tok_sents:
+            context.extend(sent)
+    return context - set(stopwords.words('english'))
 
 def main():
     #type1 = load_topic_words('type1.ts')
