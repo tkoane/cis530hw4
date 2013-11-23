@@ -46,6 +46,10 @@ def load_collection_tokens(directory):
     for file in get_all_files(directory):
         tokens.extend(load_file_tokens(directory + '/' + file))
     return tokens
+
+def load_collection_words(directory):
+    return set(load_collection_tokens(directory))
+
 #end of functions from hw1
 
 def load_topic_words(topic_file):
@@ -168,12 +172,34 @@ def get_least_specific(n, word_list):
     for i in range(n):
         ret.append(dictionary[i][0])
     return ret
-        
+
+def get_polysemous(n, word_list, part_of_speech):
+    if part_of_speech == 'noun':
+        pos = wn.NOUN
+    elif part_of_speech == 'verb':
+        pos = wn.VERB
+    elif part_of_speech == 'adjective':
+        pos = wn.ADJ
+    elif part_of_speech == 'adverb':
+        pos = wn.ADV
+
+    mapping = dict();
+    for word in word_list:
+        mapping[word] = len(wn.synsets(word, pos=pos))
+
+    return [i[0] for i in sorted(mapping.items(), key=lambda x: x[1], reverse=True)]
+
+def get_most_polysemous(n, word_list, part_of_speech):
+    return get_polysemous(n, word_list, part_of_speech)[:n]
+
+def get_least_polysemous(n, word_list, part_of_speech):
+    return list(reversed(get_polysemous(n, word_list, part_of_speech)))[:n]
+
 def main():
-    type1 = load_topic_words('type1.ts')
-    type2 = load_topic_words('type2.ts')
-    type1_list = get_top_n_topic_words(type1, 20)
-    type2_list = get_top_n_topic_words(type2, 20)
+    #type1 = load_topic_words('type1.ts')
+    #type2 = load_topic_words('type2.ts')
+    #type1_list = get_top_n_topic_words(type1, 20)
+    #type2_list = get_top_n_topic_words(type2, 20)
     #print is_noun('chess')
     #print get_similarity('operation', 'find')
     #print get_all_pairs_similarity(['settlement', 'camp', 'base', 'country'])
@@ -182,8 +208,11 @@ def main():
     #1.3.3 running get_all_pairs_similarity on the top 20 words for each topic
     #print get_all_pairs_similarity(type1_list)
     #print get_all_pairs_similarity(type2_list)
-    create_graphviz_file(gen_topic_edges(type1_list, 0.25), 'type1.viz')
-    create_graphviz_file(gen_topic_edges(type2_list, 0.25), 'type2.viz')
+    #create_graphviz_file(gen_topic_edges(type1_list, 0.25), 'type1.viz')
+    #create_graphviz_file(gen_topic_edges(type2_list, 0.25), 'type2.viz')
+    word_list = load_collection_words('data_type1/')
+    print get_most_polysemous(25, word_list, 'verb')
+    print get_least_polysemous(15, word_list, 'adjective')
     
 if __name__ == "__main__":
     main()
