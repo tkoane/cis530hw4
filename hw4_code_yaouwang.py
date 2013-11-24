@@ -148,9 +148,10 @@ def get_most_specific(n, word_list):
             synsets = wn.synsets(word, pos=wn.NOUN)
             depth = synsets[0].min_depth()
             for synset in synsets:
-                if synset.min_depth() < depth:
+                if synset.min_depth() > depth:
                     depth = synset.min_depth()
-            dictionary[word] = depth
+            if depth > 1:
+                dictionary[word] = depth
     dictionary = sorted(dictionary.items(), key=lambda x: x[1], reverse=True)
     ret = []
     for i in range(n):
@@ -164,9 +165,10 @@ def get_least_specific(n, word_list):
             synsets = wn.synsets(word, pos=wn.NOUN)
             depth = synsets[0].min_depth()
             for synset in synsets:
-                if synset.min_depth() > depth:
+                if synset.min_depth() < depth and synset.min_depth() > 1:
                     depth = synset.min_depth()
-            dictionary[word] = depth
+            if depth > 1: 
+                dictionary[word] = depth
     dictionary = sorted(dictionary.items(), key=lambda x: x[1])
     ret = []
     for i in range(n):
