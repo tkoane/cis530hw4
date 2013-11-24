@@ -188,7 +188,8 @@ def get_polysemous(n, word_list, part_of_speech):
 
     mapping = dict();
     for word in word_list:
-        mapping[word] = len(wn.synsets(word, pos=pos))
+        if len(wn.synsets(word, pos=pos)) > 0:
+            mapping[word] = len(wn.synsets(word, pos=pos))
 
     return [i[0] for i in sorted(mapping.items(), key=lambda x: x[1], reverse=True)]
 
@@ -198,17 +199,50 @@ def get_most_polysemous(n, word_list, part_of_speech):
 def get_least_polysemous(n, word_list, part_of_speech):
     return list(reversed(get_polysemous(n, word_list, part_of_speech)))[:n]
 
+#helper to convert sentences into tokenized form
+def get_tokenized_sentences(filepath):
+    sents = load_file_sentences(filepath)
+    ret = []
+    for sent in sents:
+        ret.append(word_tokenize(sent))
+    return ret
+
 def get_context(word, tok_sents):
     context = set()
     for sent in tok_sents:
         if word in tok_sents:
-            context.extend(sent)
+            for tok in sent:
+                if word != tok:
+                    context.add(tok.lower())
     return context - set(stopwords.words('english'))
 
+def lesk_disambiguate(word, context):
+    synsets = wn.synsets(word, pos=wn.NOUN)
+    best_sense = synsets[0]
+    max_overlap = 0
+    best_defn = ''
+    for synset in synsets:
+        defn = synset.definition
+        overlap = len(set(defn).intersection(context))
+        if overlap > max_overlap:
+            max_overlap = overlap
+            best_sense = synset
+            best_defn = defn
+    return (best_sense, best_defn)
+
+#helper to run the lesk algorithm on a group of files
+def run_lesk(directory, word_list):
+    for file in get_all_files(directory):
+        tok_sents = get_tokenized_sentences(directory + '/' + file)
+        for word in word_list:
+            context = get_context(word, tok_sents)
+            sense, defn = lesk_disambiguate(word, context)
+            #print (file, word, sense, defn, context)
+
 def main():
-    #type1 = load_topic_words('type1.ts')
+    type1 = load_topic_words('type1.ts')
     #type2 = load_topic_words('type2.ts')
-    #type1_list = get_top_n_topic_words(type1, 20)
+    type1_list = get_top_n_topic_words(type1, 20)
     #type2_list = get_top_n_topic_words(type2, 20)
     #print is_noun('chess')
     #print get_similarity('operation', 'find')
@@ -220,9 +254,9 @@ def main():
     #print get_all_pairs_similarity(type2_list)
     #create_graphviz_file(gen_topic_edges(type1_list, 0.25), 'type1.viz')
     #create_graphviz_file(gen_topic_edges(type2_list, 0.25), 'type2.viz')
-    word_list = load_collection_words('data_type1/')
-    print get_most_polysemous(25, word_list, 'verb')
-    print get_least_polysemous(15, word_list, 'adjective')
+    poly_list = get_most_polysemous(5, type1_list, 'noun')
+    run_lesk('data_wsd', poly_list)
+    
     
 if __name__ == "__main__":
     main()
