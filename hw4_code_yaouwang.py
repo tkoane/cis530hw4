@@ -145,7 +145,7 @@ def create_graphviz_file(edge_list, output_file):
 def get_most_specific(n, word_list):
     dictionary = dict()
     for word in word_list:
-        if isnoun(word):
+        if is_noun(word):
             synsets = wn.synsets(word, pos=wn.NOUN)
             depth = synsets[0].min_depth()
             for synset in synsets:
@@ -162,7 +162,7 @@ def get_most_specific(n, word_list):
 def get_least_specific(n, word_list):
     dictionary = dict()
     for word in word_list:
-        if isnoun(word):
+        if is_noun(word):
             synsets = wn.synsets(word, pos=wn.NOUN)
             depth = synsets[0].min_depth()
             for synset in synsets:
@@ -210,7 +210,7 @@ def get_tokenized_sentences(filepath):
 def get_context(word, tok_sents):
     context = set()
     for sent in tok_sents:
-        if word in tok_sents:
+        if word in sent:
             for tok in sent:
                 if word != tok:
                     context.add(tok.lower())
@@ -220,7 +220,7 @@ def lesk_disambiguate(word, context):
     synsets = wn.synsets(word, pos=wn.NOUN)
     best_sense = synsets[0]
     max_overlap = 0
-    best_defn = ''
+    best_defn = synsets[0].definition
     for synset in synsets:
         defn = synset.definition
         overlap = len(set(defn).intersection(context))
@@ -237,24 +237,49 @@ def run_lesk(directory, word_list):
         for word in word_list:
             context = get_context(word, tok_sents)
             sense, defn = lesk_disambiguate(word, context)
-            #print (file, word, sense, defn, context)
+            print (file, word, sense, defn, context)
 
+'''
+2.3.3
+
+The lesk algorithm does a decent job at word sense disambiguation.
+The performance accuracy of the algorithm, by simply looking through
+the 8 different files in the data_wsd folder, is around 70 to 80 percent
+(we counted around 2 to 3 wrong senses per 10 occurrences). The reason
+why such a crude algorithm can do a good job is that the words in
+the definition are frequently mentioned in the context. So when media
+is taken to mean a channel of communication, the token 'communication'
+is typically in the context. However, the algorithm can easily be improved
+if we choose to use hypernyms or synonyms of the definition as well in our
+calculation of the overlap.
+
+'''
+            
 def main():
+    #Part 1 test: load topic words
     type1 = load_topic_words('type1.ts')
-    #type2 = load_topic_words('type2.ts')
+    type2 = load_topic_words('type2.ts')
     type1_list = get_top_n_topic_words(type1, 20)
-    #type2_list = get_top_n_topic_words(type2, 20)
-    #print is_noun('chess')
-    #print get_similarity('operation', 'find')
-    #print get_all_pairs_similarity(['settlement', 'camp', 'base', 'country'])
-    #type1_list = remove_elements(type1_list)
-    #type2_list = remove_elements(type2_list)
+    type2_list = get_top_n_topic_words(type2, 20)
+    #Test is_noun
+    print is_noun('chess')
+    #Test similarity functions
+    print get_similarity('operation', 'find')
+    print get_all_pairs_similarity(['settlement', 'camp', 'base', 'country'])
+    type1_list = remove_elements(type1_list)
+    type2_list = remove_elements(type2_list)
     #1.3.3 running get_all_pairs_similarity on the top 20 words for each topic
-    #print get_all_pairs_similarity(type1_list)
-    #print get_all_pairs_similarity(type2_list)
-    #create_graphviz_file(gen_topic_edges(type1_list, 0.25), 'type1.viz')
-    #create_graphviz_file(gen_topic_edges(type2_list, 0.25), 'type2.viz')
+    print get_all_pairs_similarity(type1_list)
+    print get_all_pairs_similarity(type2_list)
+    #creating the graphviz file
+    create_graphviz_file(gen_topic_edges(type1_list, 0.25), 'type1.viz')
+    create_graphviz_file(gen_topic_edges(type2_list, 0.25), 'type2.viz')
+    #Test specific words
+    print get_most_specific(5, type1_list)
+    print get_least_specific(5, type1_list)
+    #Test polysemous words
     poly_list = get_most_polysemous(5, type1_list, 'noun')
+    #Running lesk algorithm
     run_lesk('data_wsd', poly_list)
     
     
