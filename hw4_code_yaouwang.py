@@ -218,9 +218,9 @@ def get_context(word, tok_sents):
 
 def lesk_disambiguate(word, context):
     synsets = wn.synsets(word, pos=wn.NOUN)
-    best_sense = synsets[0]
+    best_sense = None
     max_overlap = 0
-    best_defn = synsets[0].definition
+    best_defn = ''
     for synset in synsets:
         defn = synset.definition
         overlap = len(set(defn).intersection(context))
@@ -237,6 +237,9 @@ def run_lesk(directory, word_list):
         for word in word_list:
             context = get_context(word, tok_sents)
             sense, defn = lesk_disambiguate(word, context)
+            #simple printout of the lesk algorithm output
+            #print (sense, defn)
+            #more information regarding the context, word, and file
             print (file, word, sense, defn, context)
 
 '''
