@@ -1,0 +1,14 @@
+{
+  "company_name": "目标公司",
+  "excel_filename": "financial_data.xlsx",
+  "ocr_language": "chi_sim+eng",
+  "keywords": [
+    "营收", "收入", "利润", "净利润", "毛利", "毛利率",
+    "净利率", "ROE", "ROA", "PE", "PB", "EPS",
+    "市值", "股价", "涨幅", "跌幅", "成交量", "成交额",
+    "revenue", "profit", "margin", "growth", "earnings",
+    "总资产", "净资产", "负债", "现金流", "分红", "股息",
+    "同比", "环比", "增长", "下降",
+    "订单", "出货", "产能", "库存", "客户", "合同"
+  ]
+}

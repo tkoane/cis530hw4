@@ -1,0 +1,4 @@
+.processed_files.json
+output/
+__pycache__/
+*.pyc
