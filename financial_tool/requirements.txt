@@ -1,0 +1,6 @@
+# 金融数据自动化工具 - 依赖包
+# 安装方法: pip install -r requirements.txt
+
+openpyxl>=3.1.0       # Excel 文件生成
+Pillow>=9.0.0         # 图片处理
+pytesseract>=0.3.10   # OCR 文字识别（需要额外安装 Tesseract-OCR 软件）
