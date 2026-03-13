@@ -1,0 +1,3 @@
+output/*.xlsx
+output/*.csv
+.processed_files.json
